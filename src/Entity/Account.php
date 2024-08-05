@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Enums\Currency;
 use App\Repository\AccountRepository;
@@ -27,11 +28,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiResource(
     operations: [
-        new Get(),
-        new Post(
-            denormalizationContext: ['groups' => ['AccountCreate']]
-        ),
         new GetCollection(),
+        new Get(),
+        new GetCollection(
+            uriTemplate: '/business_partners/{businessPartnerId}/accounts',
+            uriVariables: [
+                'businessPartnerId' => new Link(toProperty: 'businessPartner', fromClass: BusinessPartner::class),
+            ],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['AccountCreate']],
+        ),
     ],
     normalizationContext: ['groups' => ['AccountView']]
 )]
@@ -54,7 +61,7 @@ class Account
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank]
     #[Assert\GreaterThanOrEqual(0)]
-    #[Groups(['AccountView'])]
+    #[Groups(['AccountView', 'AccountCreate'])]
     private string $balance = '0';
 
     #[ORM\ManyToOne(targetEntity: BusinessPartner::class, inversedBy: 'accounts')]
@@ -63,7 +70,7 @@ class Account
     #[Groups(['AccountView', 'AccountCreate'])]
     private BusinessPartner $businessPartner;
 
-    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'businessPartner')]
+    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'account')]
     #[Groups(['AccountView'])]
     private Collection $transactions;
 
@@ -131,6 +138,6 @@ class Account
 
     public function __toString(): string
     {
-        return $this->businessPartner->getName().' - '.$this->currency->value;
+        return $this->businessPartner->getName() . ' - ' . $this->currency->value;
     }
 }

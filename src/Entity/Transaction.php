@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             uriTemplate: '/transactions/{id}/payout/execute',
             controller: PayoutExecutionController::class,
-            denormalizationContext: ['groups' => ['TransactionPatch']]
+            denormalizationContext: ['groups' => ['TransactionExecute']]
         ),
         new GetCollection(),
     ],

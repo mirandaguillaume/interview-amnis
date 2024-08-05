@@ -3,9 +3,11 @@
 namespace App\Tests\Behat;
 
 use ApiPlatform\Api\IriConverterInterface;
+use App\Entity\Account;
 use App\Entity\BusinessPartner;
 use App\Entity\Transaction;
 use App\Enums\BusinessPartnerStatusEnum;
+use App\Enums\Currency;
 use App\Enums\LegalFormEnum;
 use App\Enums\TransactionTypeEnum;
 use Behat\Behat\Context\Context;
@@ -55,13 +57,39 @@ class AppContext implements Context
             $businessPartner->setName($businessPartnerItem['name']);
             $businessPartner->setStatus($businessPartnerItem['status']);
             $businessPartner->setLegalForm($businessPartnerItem['legalForm']);
-            $businessPartner->setBalance($businessPartnerItem['balance']);
             $businessPartner->setAddress($businessPartnerItem['address']);
             $businessPartner->setCity($businessPartnerItem['city']);
             $businessPartner->setZip($businessPartnerItem['zip']);
             $businessPartner->setCountry($businessPartnerItem['country']);
 
             $manager->persist($businessPartner);
+        }
+
+        $manager->flush();
+    }
+
+    /**
+     * @Given there is an account with data:
+     */
+    public function createAccount(TableNode $tableNode)
+    {
+        $accountArray = $this->transformTableToArray($tableNode);
+
+        $manager = $this->getManager();
+
+        foreach ($accountArray as $accountItem) {
+            $account = new Account();
+            $account->setCurrency($accountItem['currency']);
+            $account->setBalance($accountItem['balance']);
+
+            /** @var BusinessPartner $businessPartner */
+            $businessPartner = $accountItem['businessPartner'];
+
+            if ($businessPartner instanceof BusinessPartner) {
+                $account->setBusinessPartner($businessPartner);
+            }
+
+            $manager->persist($account);
         }
 
         $manager->flush();
@@ -87,11 +115,11 @@ class AppContext implements Context
             $transaction->setIban($transactionItem['iban']);
             $transaction->setIban($transactionItem['iban']);
 
-            /** @var BusinessPartner $businessPartner */
-            $businessPartner = $transactionItem['businessPartner'];
+            /** @var Account $account */
+            $account = $transactionItem['account'];
 
-            if ($businessPartner instanceof BusinessPartner) {
-                $transaction->setBusinessPartner($businessPartner);
+            if ($account instanceof Account) {
+                $transaction->setAccount($account);
             }
 
             $manager->persist($transaction);
@@ -156,8 +184,12 @@ class AppContext implements Context
             case 'type':
                 $value = TransactionTypeEnum::tryFrom($value);
                 break;
+            case 'currency':
+                $value = Currency::tryFrom($value);
+                break;
             case 'transaction':
             case 'businessPartner':
+            case 'account':
                 $value = $this->iriConverter->getResourceFromIri($value);
                 break;
         }

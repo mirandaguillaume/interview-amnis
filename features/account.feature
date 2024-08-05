@@ -1,5 +1,5 @@
-Feature: Transaction
-  In order to manage transactions
+Feature: Account
+  In order to manage accounts
   As a user
   I need to be able manage transactions through REST API
 
@@ -10,12 +10,12 @@ Feature: Transaction
     Given there is a business partner with data:
       | name                       | status | legalForm                 | balance | address          | city   | zip  | country |
       | AMNIS Treasury Services AG | active | limited_liability_company | 400     | Baslerstrasse 60 | Zürich | 8048 | CH      |
-      | AMNIS Europe AG            | active | limited_liability_company | 200     | Gewerbeweg 15    | Vaduz  | 9490 | LI      |
-    Given create a transaction with data:
-      | name                       | amount | date                | executed | type   | country | iban                  | businessPartner          |
-      | AMNIS Treasury Services AG | 100    | 2024-07-01 13:32:45 | false    | payin  | CH      | CH5604835012345678009 | /api/business_partners/1 |
-      | AMNIS Europe AG            | 100    | 2024-07-01 13:32:45 | false    | payout | LI      | LI7408806123456789012 | /api/business_partners/2 |
-    When I send a GET request to "/api/transactions"
+    Given there is an account with data:
+      | currency | businessPartner          | balance |
+      | EUR      | /api/business_partners/1 | 0       |
+      | CHF      | /api/business_partners/1 | 0       |
+    When I send a GET request to "/api/accounts"
+    Then print last response
     Then the response status code should be 200
     And the JSON node "hydra:member" should have 2 elements
 
@@ -23,19 +23,14 @@ Feature: Transaction
     Given there is a business partner with data:
       | name                       | status | legalForm                 | balance | address          | city   | zip  | country |
       | AMNIS Treasury Services AG | active | limited_liability_company | 400     | Baslerstrasse 60 | Zürich | 8048 | CH      |
-    Given create a transaction with data:
-      | name                       | amount | date                | executed | type   | country | iban                  | businessPartner          |
-      | AMNIS Treasury Services AG | 100    | 2024-07-01 13:32:45 | false    | payin  | CH      | CH5604835012345678009 | /api/business_partners/1 |
-    When I send a GET request to "/api/transactions/1"
+    Given there is an account with data:
+      | currency | businessPartner          | balance |
+      | EUR      | /api/business_partners/1 | 0       |
+    When I send a GET request to "/api/accounts/1"
     Then the response status code should be 200
-    And the JSON node "@id" should be equal to the string "/api/transactions/1"
-    And the JSON node "name" should be equal to the string "AMNIS Treasury Services AG"
-    And the JSON node "amount" should be equal to "100"
-    And the JSON node "date" should be equal to the string "2024-07-01T13:32:45+00:00"
-    And the JSON node "executed" should be false
-    And the JSON node "type" should be equal to the string "payin"
-    And the JSON node "country" should be equal to "CH"
-    And the JSON node "iban" should be equal to "CH5604835012345678009"
+    And the JSON node "@id" should be equal to the string "/api/accounts/1"
+    And the JSON node "currency" should be equal to the string "EUR"
+    And the JSON node "balance" should be equal to "100"
     And the JSON node "businessPartner" should be equal to the string "/api/business_partners/1"
 
   Scenario: Create payin transaction

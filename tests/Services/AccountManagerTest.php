@@ -10,7 +10,7 @@ use App\Enums\Currency;
 use App\Service\AccountManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class BalanceManagerTest extends WebTestCase
+class AccountManagerTest extends WebTestCase
 {
     private AccountManager $accountManager;
 

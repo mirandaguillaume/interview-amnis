@@ -25,7 +25,6 @@ Feature: Business partner
     And the JSON node "name" should be equal to the string "AMNIS Treasury Services AG"
     And the JSON node "status" should be equal to the string "active"
     And the JSON node "legalForm" should be equal to the string "limited_liability_company"
-    And the JSON node "balance" should be equal to 400
     And the JSON node "address" should be equal to the string "Baslerstrasse 60"
     And the JSON node "city" should be equal to the string "Zürich"
     And the JSON node "zip" should be equal to "8048"

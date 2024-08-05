@@ -4,7 +4,9 @@ namespace App\Service;
 
 use App\Entity\Transaction;
 use App\Enums\TransactionTypeEnum;
+use App\Exceptions\AlreadyExecutedTransaction;
 use App\Exceptions\TransactionExecutionException;
+use App\Exceptions\WrongTransactionType;
 
 class PayinManager
 {
@@ -14,13 +16,13 @@ class PayinManager
 
     public function execute(Transaction $transaction): void
     {
-        if ($transaction->getType() !== TransactionTypeEnum::PAYIN) {
-            throw new TransactionExecutionException('Transaction type is not payin');
-        }
+        $transaction->getType() !== TransactionTypeEnum::PAYIN ?:
+            throw new WrongTransactionType(
+                TransactionTypeEnum::PAYIN,
+                $transaction->getType(),
+            );
 
-        if ($transaction->isExecuted()) {
-            throw new TransactionExecutionException('Transaction is already executed');
-        }
+        $transaction->isExecuted() ?: throw new AlreadyExecutedTransaction();
 
         $transaction->setExecuted(true);
 

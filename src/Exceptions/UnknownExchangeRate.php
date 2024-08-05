@@ -10,7 +10,7 @@ class UnknownExchangeRate extends \Exception
         Currency $from,
         Currency $to,
         int $code = 0,
-        \Exception $previous = null,
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             "Unknown exchange rate from $from->value to $to->value",
