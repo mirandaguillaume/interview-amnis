@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Account;
 use App\Entity\BusinessPartner;
 use App\Entity\Transaction;
+use App\Enums\Currency;
 use App\Enums\TransactionTypeEnum;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -24,10 +26,10 @@ class TransactionType extends AbstractType
             ->add('type', EnumType::class, ["class" => TransactionTypeEnum::class])
             ->add('country')
             ->add('iban')
-            ->add('businessPartner', EntityType::class, [
-                'class' => BusinessPartner::class,
-                'choice_label' => 'name',
-            ]);
+            ->add('account', EntityType::class, [
+                'class' => Account::class,
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

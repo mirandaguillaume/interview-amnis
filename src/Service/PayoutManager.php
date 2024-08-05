@@ -9,7 +9,7 @@ use DateTime;
 
 class PayoutManager
 {
-    public function __construct(private readonly BalanceManager $balanceManager)
+    public function __construct(private readonly AccountManager $accountManager)
     {
     }
 
@@ -27,8 +27,8 @@ class PayoutManager
             throw new TransactionExecutionException('Payout transaction date can be only on the current date');
         }
 
-        if (!$this->balanceManager->hasEnoughMoneyForPayout(
-            $transaction->getBusinessPartner(),
+        if (!$this->accountManager->hasEnoughMoneyForPayout(
+            $transaction->getAccount(),
             $transaction->getAmount()
         )) {
             throw new TransactionExecutionException('You do not have enough money for a payout');
@@ -36,6 +36,9 @@ class PayoutManager
 
         $transaction->setExecuted(true);
 
-        $this->balanceManager->decreaseBalance($transaction->getBusinessPartner(), $transaction->getAmount());
+        $this->accountManager->decreaseBalance(
+            $transaction->getAccount(),
+            $transaction->getAmount()
+        );
     }
 }

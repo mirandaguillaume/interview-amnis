@@ -8,7 +8,7 @@ use App\Exceptions\TransactionExecutionException;
 
 class PayinManager
 {
-    public function __construct(private readonly BalanceManager $balanceManager)
+    public function __construct(private readonly AccountManager $accountManager)
     {
     }
 
@@ -24,6 +24,9 @@ class PayinManager
 
         $transaction->setExecuted(true);
 
-        $this->balanceManager->increaseBalance($transaction->getBusinessPartner(), $transaction->getAmount());
+        $this->accountManager->increaseBalance(
+            $transaction->getAccount(),
+            $transaction->getAmount(),
+        );
     }
 }

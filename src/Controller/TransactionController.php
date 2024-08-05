@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Transaction;
+use App\Enums\Currency;
 use App\Form\TransactionType;
 use App\Repository\BusinessPartnerRepository;
 use App\Repository\TransactionRepository;
@@ -21,16 +22,19 @@ class TransactionController extends AbstractController
     public function list(
         Request $request,
         TransactionRepository $transactionRepository,
-        BusinessPartnerRepository $businessPartnerRepository
+        BusinessPartnerRepository $businessPartnerRepository,
     ): Response {
         $businessPartnerId = $request->query->get('businessPartnerId');
+        $currencyValue = $request->query->get('currency');
 
         $businessPartner = $businessPartnerId ? $businessPartnerRepository->find($businessPartnerId) : null;
+        $currency = Currency::tryFrom($currencyValue);
 
         return $this->render('transaction/list.html.twig', [
             'businessPartner' => $businessPartner,
+            'currency' => $currency,
             'transactions' => $businessPartner
-                ? $transactionRepository->findByBusinessPartner($businessPartner)
+                ? $transactionRepository->findByBusinessPartnerAndCurrency($businessPartner, $currency)
                 : $transactionRepository->findAll(),
         ]);
     }

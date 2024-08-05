@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
+use App\Entity\Account;
 use App\Entity\BusinessPartner;
-use App\Enums\BusinessPartnerStatusEnum;
-use App\Enums\LegalFormEnum;
-use App\Service\BalanceManager;
+use App\Enums\Currency;
+use App\Service\AccountManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BalanceManagerTest extends WebTestCase
 {
-    private BalanceManager $balanceManager;
+    private AccountManager $accountManager;
 
     protected function setUp(): void
     {
@@ -21,47 +21,58 @@ class BalanceManagerTest extends WebTestCase
         self::bootKernel();
         $container = static::getContainer();
 
-        $this->balanceManager = $container->get(BalanceManager::class);
+        $this->accountManager = $container->get(AccountManager::class);
     }
 
     public function testPayinBalanceChange(): void
     {
-        $businessPartner = $this->createBusinessPartner();
+        $account = $this->createAccount();
 
-        $this->balanceManager->increaseBalance($businessPartner, '1000');
+        $this->accountManager->increaseBalance($account, '1000');
 
-        $this->assertEquals('11000', $businessPartner->getBalance());
+        $this->assertEquals('11000', $account->getBalance());
     }
 
     public function testPayoutBalanceChange(): void
     {
-        $businessPartner = $this->createBusinessPartner();
+        $account = $this->createAccount();
 
-        $this->balanceManager->decreaseBalance($businessPartner, '1000');
+        $this->accountManager->decreaseBalance($account, '1000');
 
-        $this->assertEquals('9000', $businessPartner->getBalance());
+        $this->assertEquals('9000', $account->getBalance());
     }
 
-    public function testHasEnoughMoneyForPayout(): void
+    /**
+     * @dataProvider providePayoutBalanceResult
+     */
+    public function testHasEnoughMoneyForPayout(string $amount, bool $result): void
     {
-        $businessPartner = $this->createBusinessPartner();
-
-        $this->assertTrue($this->balanceManager->hasEnoughMoneyForPayout($businessPartner, '1000'));
-        $this->assertFalse($this->balanceManager->hasEnoughMoneyForPayout($businessPartner, '11000'));
+        $this->assertEquals(
+            $result,
+            $this->accountManager->hasEnoughMoneyForPayout($this->createAccount(), $amount),
+        );
     }
 
-    private function createBusinessPartner(): BusinessPartner
+    public function providePayoutBalanceResult(): \Generator
     {
-        $businessPartner = new BusinessPartner();
-        $businessPartner->setName('AMNIS Treasury Services AG');
-        $businessPartner->setStatus(BusinessPartnerStatusEnum::ACTIVE);
-        $businessPartner->setLegalForm(LegalFormEnum::LIMITED_LIABILITY_COMPANY);
-        $businessPartner->setBalance('10000');
-        $businessPartner->setAddress('Baslerstrasse 60');
-        $businessPartner->setCity('Zürich');
-        $businessPartner->setZip('8048');
-        $businessPartner->setCountry('CH');
+        yield 'enough money' => [
+            'amount' => '1000',
+            'result' => true,
+        ];
+        yield 'not enough money' => [
+            'amount' => '11000',
+            'result' => false,
+        ];
+    }
 
-        return $businessPartner;
+    private function createAccount(): Account
+    {
+        $account = new Account();
+
+        $account->setBalance('10000');
+        $account->setCurrency(Currency::EUR);
+        $account->setBusinessPartner(new BusinessPartner());
+
+        return $account;
     }
 }

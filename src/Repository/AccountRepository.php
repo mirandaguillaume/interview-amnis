@@ -2,17 +2,17 @@
 
 namespace App\Repository;
 
-use App\Entity\BusinessPartner;
+use App\Entity\Account;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<BusinessPartner>
+ * @extends ServiceEntityRepository<Account>
  */
-class BusinessPartnerRepository extends ServiceEntityRepository
+class AccountRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, BusinessPartner::class);
+        parent::__construct($registry, Account::class);
     }
 }
