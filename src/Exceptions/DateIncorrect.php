@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-class PayoutDateIncorrect extends TransactionExecutionException
+class DateIncorrect extends TransactionExecutionException
 {
     public function __construct(\DateTimeImmutable $givenDate, int $code = 0, ?\Throwable $previous = null)
     {

@@ -6,8 +6,7 @@ use App\Entity\Transaction;
 use App\Enums\TransactionTypeEnum;
 use App\Exceptions\AlreadyExecutedTransaction;
 use App\Exceptions\NotEnoughBalance;
-use App\Exceptions\PayoutDateIncorrect;
-use App\Exceptions\TransactionExecutionException;
+use App\Exceptions\DateIncorrect;
 use App\Exceptions\WrongTransactionType;
 use DateTime;
 
@@ -30,8 +29,8 @@ class PayoutManager
             throw new AlreadyExecutedTransaction();
         }
 
-        if ($transaction->getDate() > (new DateTime())) {
-            throw new PayoutDateIncorrect($transaction->getDate());
+        if ($transaction->getDate() > new \DateTimeImmutable()) {
+            throw new DateIncorrect($transaction->getDate());
         }
 
         if (!$this->accountManager->hasEnoughMoneyForPayout(

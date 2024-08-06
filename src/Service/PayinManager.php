@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Transaction;
 use App\Enums\TransactionTypeEnum;
 use App\Exceptions\AlreadyExecutedTransaction;
-use App\Exceptions\TransactionExecutionException;
 use App\Exceptions\WrongTransactionType;
 
 class PayinManager

@@ -11,7 +11,6 @@ use App\Enums\Currency;
 use App\Repository\AccountRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Schema\UniqueConstraint;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,12 +18,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
-#[ORM\Table(
-    name: 'accounts',
-    uniqueConstraints: [new UniqueConstraint(
-        'business_currencies',
-        ['business_partner_id', 'currency']
-    )],
+#[ORM\Table(name: 'accounts')]
+#[ORM\UniqueConstraint(
+    'business_currencies',
+    ['business_partner_id', 'currency'],
 )]
 #[ApiResource(
     operations: [

@@ -40,6 +40,6 @@ class AccountManager
         $remainingBalance = (float)$account->getBalance();
         $remainingBalance -= (float)$amount;
 
-        return $remainingBalance >= 0;
+        return bccomp((string)$remainingBalance, '0') === 1;
     }
 }

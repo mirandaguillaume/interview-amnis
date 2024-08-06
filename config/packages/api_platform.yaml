@@ -27,4 +27,4 @@ api_platform:
         ApiPlatform\Validator\Exception\ValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY
 
         # Custom mapping
-        App\Exceptions\TransactionExecutionException: 400 # Here is the handler for our custom exception
+        App\Exceptions\InterviewProjectException: 400 # Here is the handler for our custom exception

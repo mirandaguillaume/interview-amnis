@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use App\Enums\BusinessPartnerStatusEnum;
 use App\Enums\Currency;
 use App\Enums\LegalFormEnum;
+use App\Exceptions\NoAccountForCurrency;
 use App\Repository\BusinessPartnerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -193,6 +194,7 @@ class BusinessPartner
             ->where(Criteria::expr()->eq('currency', $currency))
         ;
 
-        return $this->accounts->matching($criteria)->first();
+        return $this->accounts->matching($criteria)->first()
+            ?: throw new NoAccountForCurrency($currency);
     }
 }

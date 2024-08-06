@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-class NotEnoughBalance extends TransactionExecutionException
+class NotEnoughBalance extends InterviewProjectException
 {
     public function __construct(int $code = 0, ?\Throwable $previous = null)
     {
