@@ -16,13 +16,13 @@ class PayinManager
 
     public function execute(Transaction $transaction): void
     {
-        $transaction->getType() !== TransactionTypeEnum::PAYIN ?:
-            throw new WrongTransactionType(
-                TransactionTypeEnum::PAYIN,
-                $transaction->getType(),
-            );
+        if ($transaction->getType() !== TransactionTypeEnum::PAYIN) {
+            throw new WrongTransactionType(TransactionTypeEnum::PAYIN, $transaction->getType());
+        }
 
-        $transaction->isExecuted() ?: throw new AlreadyExecutedTransaction();
+        if ($transaction->isExecuted()) {
+            throw new AlreadyExecutedTransaction();
+        }
 
         $transaction->setExecuted(true);
 
