@@ -77,6 +77,14 @@ class Exchange
     #[Groups(['ExchangeView'])]
     private bool $executed = false;
 
+    #[ORM\OneToOne(targetEntity: Transaction::class, cascade: ['persist'])]
+    #[Groups(['ExchangeView'])]
+    private ?Transaction $payoutTransaction = null;
+
+    #[ORM\OneToOne(targetEntity: Transaction::class, cascade: ['persist'])]
+    #[Groups(['ExchangeView'])]
+    private ?Transaction $payinTransaction = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -165,5 +173,25 @@ class Exchange
     public function setExecuted(bool $executed): void
     {
         $this->executed = $executed;
+    }
+
+    public function getPayoutTransaction(): ?Transaction
+    {
+        return $this->payoutTransaction;
+    }
+
+    public function setPayoutTransaction(?Transaction $payoutTransaction): void
+    {
+        $this->payoutTransaction = $payoutTransaction;
+    }
+
+    public function getPayinTransaction(): ?Transaction
+    {
+        return $this->payinTransaction;
+    }
+
+    public function setPayinTransaction(?Transaction $payinTransaction): void
+    {
+        $this->payinTransaction = $payinTransaction;
     }
 }

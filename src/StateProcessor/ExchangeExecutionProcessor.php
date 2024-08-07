@@ -26,7 +26,6 @@ class ExchangeExecutionProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly PersistProcessor $persistProcessor,
         private readonly AccountManager $accountManager,
-        private readonly EntityManagerInterface $entityManager,
     )
     {}
 
@@ -84,8 +83,8 @@ class ExchangeExecutionProcessor implements ProcessorInterface
         $exchangePayinTransaction->setName("Exchange payin from {$data->getFromCurrency()->value} account");
         $exchangePayinTransaction->setExecuted(true);
 
-        $this->entityManager->persist($exchangePayoutTransaction);
-        $this->entityManager->persist($exchangePayinTransaction);
+        $data->setPayoutTransaction($exchangePayoutTransaction);
+        $data->setPayinTransaction($exchangePayinTransaction);
 
         $this->persistProcessor->process($data, $operation, $context);
 
