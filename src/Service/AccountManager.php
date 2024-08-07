@@ -13,33 +13,24 @@ class AccountManager
 
     public function increaseBalance(Account $account, string $amount): string
     {
-        $balance = (float)$account->getBalance();
-        $balance += (float)$amount;
-
-        $account->setBalance((string)$balance);
+        $account->setBalance(bcadd($account->getBalance(), $amount));
 
         $this->entityManager->flush();
 
-        return $balance;
+        return $account->getBalance();
     }
 
-    public function decreaseBalance(Account $account, string $amount,): string
+    public function decreaseBalance(Account $account, string $amount): string
     {
-        $balance = (float)$account->getBalance();
-        $balance -= (float)$amount;
-
-        $account->setBalance((string)$balance);
+        $account->setBalance(bcsub($account->getBalance(), $amount));
 
         $this->entityManager->flush();
 
-        return $balance;
+        return $account->getBalance();
     }
 
     public function hasEnoughMoneyForPayout(Account $account, string $amount): bool
     {
-        $remainingBalance = (float)$account->getBalance();
-        $remainingBalance -= (float)$amount;
-
-        return bccomp((string)$remainingBalance, '0') === 1;
+        return bccomp(bcsub($account->getBalance(), $amount), '0') >= 0;
     }
 }
