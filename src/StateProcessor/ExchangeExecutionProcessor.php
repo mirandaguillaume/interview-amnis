@@ -6,12 +6,15 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Exchange;
+use App\Entity\Transaction;
+use App\Enums\TransactionTypeEnum;
 use App\Exceptions\AlreadyExecutedTransaction;
 use App\Exceptions\NotEnoughBalance;
 use App\Exceptions\DateIncorrect;
 use App\Exceptions\SameCurrencyExchange;
 use App\Gateway\ExchangeRateGateway;
 use App\Service\AccountManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -23,6 +26,7 @@ class ExchangeExecutionProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly PersistProcessor $persistProcessor,
         private readonly AccountManager $accountManager,
+        private readonly EntityManagerInterface $entityManager,
     )
     {}
 
@@ -58,6 +62,30 @@ class ExchangeExecutionProcessor implements ProcessorInterface
         $this->accountManager->increaseBalance($toAccount, $data->getToAmount());
 
         $data->setExecuted(true);
+
+        $exchangePayoutTransaction = new Transaction();
+        $exchangePayoutTransaction->setDate($data->getDate());
+        $exchangePayoutTransaction->setAccount($fromAccount);
+        $exchangePayoutTransaction->setAmount($data->getFromAmount());
+        $exchangePayoutTransaction->setType(TransactionTypeEnum::EXCHANGE_PAYOUT);
+        $exchangePayoutTransaction->setCountry($data->getBusinessPartner()->getCountry());
+        $exchangePayoutTransaction->setIban('internal');
+        $exchangePayoutTransaction->setName("Exchange payout to {$data->getToCurrency()->value} account");
+        $exchangePayoutTransaction->setExecuted(true);
+
+
+        $exchangePayinTransaction = new Transaction();
+        $exchangePayinTransaction->setDate($data->getDate());
+        $exchangePayinTransaction->setAccount($fromAccount);
+        $exchangePayinTransaction->setAmount($data->getToAmount());
+        $exchangePayinTransaction->setType(TransactionTypeEnum::EXCHANGE_PAYIN);
+        $exchangePayinTransaction->setCountry($data->getBusinessPartner()->getCountry());
+        $exchangePayinTransaction->setIban('internal');
+        $exchangePayinTransaction->setName("Exchange payin from {$data->getFromCurrency()->value} account");
+        $exchangePayinTransaction->setExecuted(true);
+
+        $this->entityManager->persist($exchangePayoutTransaction);
+        $this->entityManager->persist($exchangePayinTransaction);
 
         $this->persistProcessor->process($data, $operation, $context);
 
