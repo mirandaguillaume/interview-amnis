@@ -220,7 +220,7 @@ Feature: Transaction
     Given there is an account with data:
       | currency | businessPartner          | balance |
       | EUR      | /api/business_partners/1 | 900     |
-    When I send a POST request to "/api/transactions/payout" with body:
+    When I send a POST request to "/api/transactions/payout/execute" with body:
     """
       {
         "amount": "300",

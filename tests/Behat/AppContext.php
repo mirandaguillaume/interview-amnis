@@ -5,6 +5,7 @@ namespace App\Tests\Behat;
 use ApiPlatform\Api\IriConverterInterface;
 use App\Entity\Account;
 use App\Entity\BusinessPartner;
+use App\Entity\Exchange;
 use App\Entity\Transaction;
 use App\Enums\BusinessPartnerStatusEnum;
 use App\Enums\Currency;
@@ -80,7 +81,7 @@ class AppContext implements Context
         foreach ($accountArray as $accountItem) {
             $account = new Account();
             $account->setCurrency($accountItem['currency']);
-            $account->setBalance($accountItem['balance']);
+            $account->setBalance($accountItem['balance'] ?: '0');
 
             /** @var BusinessPartner $businessPartner */
             $businessPartner = $accountItem['businessPartner'];
@@ -190,6 +191,7 @@ class AppContext implements Context
             case 'transaction':
             case 'businessPartner':
             case 'account':
+            case 'exchange':
                 $value = $this->iriConverter->getResourceFromIri($value);
                 break;
         }

@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: ExchangePostProcessor::class,
         ),
         new Patch(
-            uriTemplate: '/api/exchanges/{id}/execute',
+            uriTemplate: '/exchanges/{id}/execute',
             denormalizationContext: ['groups' => ['ExchangeExecute']],
             processor: ExchangeExecutionProcessor::class,
         ),
