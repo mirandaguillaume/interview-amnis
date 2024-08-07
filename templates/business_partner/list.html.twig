@@ -16,7 +16,7 @@
                 <th>City</th>
                 <th>Zip</th>
                 <th>Country</th>
-                <th>Balance</th>
+                <th>Nb of currency accounts</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -31,7 +31,7 @@
                     <td>{{ businessPartner.city }}</td>
                     <td>{{ businessPartner.zip }}</td>
                     <td>{{ businessPartner.country }}</td>
-                    <td>{{ businessPartner.balance }}</td>
+                    <td>{{ businessPartner.accounts.count }}</td>
                     <td>
                         <div class="btn-group" role="group">
                             <a class="btn btn-sm btn-outline-primary"

@@ -7,10 +7,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Enums\BusinessPartnerStatusEnum;
+use App\Enums\Currency;
 use App\Enums\LegalFormEnum;
+use App\Exceptions\NoAccountForCurrency;
 use App\Repository\BusinessPartnerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -71,15 +74,12 @@ class BusinessPartner
     #[Groups(['BusinessPartnerView', 'BusinessPartnerCreate'])]
     private string $country;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Assert\NotBlank]
-    #[Assert\GreaterThanOrEqual(0)]
+    /**
+     * @var ArrayCollection<Account>
+     */
+    #[ORM\OneToMany(targetEntity: Account::class, mappedBy: 'businessPartner')]
     #[Groups(['BusinessPartnerView'])]
-    private ?string $balance = '0';
-
-    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'businessPartner')]
-    #[Groups(['BusinessPartnerView'])]
-    private Collection $transactions;
+    private Collection $accounts;
 
     public function __toString(): string
     {
@@ -88,7 +88,7 @@ class BusinessPartner
 
     public function __construct()
     {
-        $this->transactions = new ArrayCollection();
+        $this->accounts = new ArrayCollection();
     }
 
     public function getId(): int
@@ -166,35 +166,35 @@ class BusinessPartner
         $this->country = $country;
     }
 
-    public function getBalance(): ?string
+    public function getAccounts(): Collection
     {
-        return $this->balance;
+        return $this->accounts;
     }
 
-    public function setBalance(?string $balance): void
+    public function setAccounts(Collection $accounts): void
     {
-        $this->balance = $balance;
+        $this->accounts = $accounts;
     }
 
-    public function getTransactions(): Collection
+    public function addAccount(Account $account): void
     {
-        return $this->transactions;
-    }
-
-    public function setTransactions(Collection $transactions): void
-    {
-        $this->transactions = $transactions;
-    }
-
-    public function addTransaction(Transaction $transaction): void
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions->add($transaction);
+        if (!$this->accounts->contains($account)) {
+            $this->accounts->add($account);
         }
     }
 
-    public function removeTransaction(Transaction $transaction): void
+    public function removeAccount(Account $account): void
     {
-        $this->transactions->removeElement($transaction);
+        $this->accounts->removeElement($account);
+    }
+
+    public function getAccountByCurrency(Currency $currency): Account
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('currency', $currency))
+        ;
+
+        return $this->accounts->matching($criteria)->first()
+            ?: throw new NoAccountForCurrency($currency);
     }
 }

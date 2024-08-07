@@ -2,12 +2,16 @@
 
 namespace App\Form;
 
+use App\Entity\Account;
 use App\Entity\BusinessPartner;
 use App\Enums\BusinessPartnerStatusEnum;
 use App\Enums\LegalFormEnum;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BusinessPartnerType extends AbstractType
@@ -22,7 +26,6 @@ class BusinessPartnerType extends AbstractType
             ->add('city')
             ->add('zip')
             ->add('country')
-            ->add('balance')
         ;
     }
 

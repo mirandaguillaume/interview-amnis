@@ -1,3 +1,4 @@
+
 # Description
 This project is a very dummy version of our system, where you can manually create a pay-in into an account and a payout from an account. The system allows a payout only if there is enough money in a given company’s account. This version can handle only 1 single currency.
 

@@ -4,9 +4,13 @@ namespace App\Repository;
 
 use App\Entity\BusinessPartner;
 use App\Entity\Transaction;
+use App\Enums\Currency;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Transaction>
+ */
 class TransactionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,12 +18,25 @@ class TransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, Transaction::class);
     }
 
-    public function findByBusinessPartner(BusinessPartner $businessPartner): array
+    public function findByBusinessPartnerAndCurrency(
+        BusinessPartner $businessPartner,
+        ?Currency       $currency = null,
+    ): array
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.businessPartner = :businessPartner')
+        $queryBuilder = $this->createQueryBuilder('t');
+
+        $queryBuilder
+            ->leftJoin('t.account', 'a')
+            ->andWhere('a.businessPartner = :businessPartner')
             ->setParameter('businessPartner', $businessPartner)
-            ->getQuery()
-            ->getResult();
+        ;
+
+        if ($currency !== null) {
+            $queryBuilder->andWhere('a.currency = :currency')
+                ->setParameter('currency', $currency);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
+
 }

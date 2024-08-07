@@ -12,7 +12,7 @@ default:
         FriendsOfBehat\SymfonyExtension:
             bootstrap: 'config/behat/bootstrap.php'
             kernel:
-                debug: false
+                debug: true
                 environment: test
         Behatch\Extension: ~
         Behat\MinkExtension:
